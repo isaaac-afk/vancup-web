@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VanCup 🇨🇦⚽
 
-## Getting Started
+A Vancouver-focused dashboard for **FIFA World Cup 2026** — live scores from across the tournament plus the full schedule for all **7 matches at BC Place**, including both of Canada's group-stage home games.
 
-First, run the development server:
+**Live URL:** _https://your-vancup.vercel.app_ (deploy in progress)
+
+---
+
+## Screenshots
+
+> _Coming soon — drop screenshots in `/public` and link them here._
+>
+> | Home / next match | Live scores |
+> | ----------------- | ----------- |
+> | _placeholder_     | _placeholder_ |
+
+---
+
+## Tech stack
+
+- **Next.js 16** (App Router, React Server Components)
+- **React 19**
+- **TypeScript**
+- **Tailwind CSS v4**
+- **ESPN public soccer API** for live + tournament-wide scores
+- **Vercel** for hosting (ISR / `revalidate: 30`)
+
+No backend, no database, no API keys in v1 — the homepage is a Server Component that fetches scores directly from ESPN and caches them with Incremental Static Regeneration.
+
+---
+
+## Run locally
 
 ```bash
+git clone https://github.com/isaaac-afk/vancup-web.git
+cd vancup-web
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build   # production build
+npm run start   # serve the production build
+npm run lint    # eslint
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Architecture
 
-To learn more about Next.js, take a look at the following resources:
+### v1 — frontend-only (this repo)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+Browser ──▶ Next.js Server Component ──▶ ESPN scoreboard API
+                     │
+                     └─ cached with ISR (revalidate: 30s)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `lib/vancouver.ts` — the 7 statically known BC Place fixtures + `getNextVancouverMatch()`.
+- `lib/espn.ts` — typed client for ESPN's `soccer/fifa.world/scoreboard` endpoint; maps their `events[]` shape to a clean `LiveMatch` type and degrades gracefully (returns `[]`) on failure.
+- `app/page.tsx` — Server Component homepage: next BC Place match, a "Live now" section, all 7 Vancouver fixtures, and a tournament-wide feed.
 
-## Deploy on Vercel
+Why this shape? The World Cup starts **June 11, 2026**, so v1 prioritizes shipping a fast, reliable, read-only dashboard today with zero infra to manage.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### v2 — planned
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **FastAPI** backend to normalize and persist match data.
+- **Supabase** (Postgres) for fixtures, results, and historical data.
+- An **Elo-based predictor** for match outcome probabilities.
+- Tests, and a proper data pipeline instead of hitting ESPN at request time.
+
+---
+
+## Credit
+
+Built by **Isaac Glenu** — [github.com/isaaac-afk](https://github.com/isaaac-afk)
