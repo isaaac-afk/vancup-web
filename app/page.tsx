@@ -1,7 +1,7 @@
 import {
-  VANCOUVER_MATCHES,
-  getNextVancouverMatch,
-  type VancouverMatch,
+  CANADA_MATCHES,
+  getNextCanadaMatch,
+  type CanadaMatch,
 } from "@/lib/vancouver";
 import { fetchLiveMatches, type LiveMatch } from "@/lib/espn";
 
@@ -135,8 +135,24 @@ function MatchCard({ match }: { match: LiveMatch }) {
   );
 }
 
-// Card for a statically known Vancouver fixture.
-function VancouverRow({ match }: { match: VancouverMatch }) {
+// Small pill showing the host venue + city, colour-coded per stadium.
+function VenuePill({ match }: { match: CanadaMatch }) {
+  const tint =
+    match.venue === "BC Place"
+      ? "bg-emerald-500/15 text-emerald-300"
+      : "bg-blue-500/15 text-blue-300";
+
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${tint}`}
+    >
+      {match.venue} · {match.venueCity}
+    </span>
+  );
+}
+
+// Card for a statically known Canadian fixture.
+function CanadaRow({ match }: { match: CanadaMatch }) {
   const border = match.isCanada ? "border-red-500/50" : "border-white/10";
   const subtitle = match.group
     ? `${match.stage} · Group ${match.group}`
@@ -146,7 +162,7 @@ function VancouverRow({ match }: { match: VancouverMatch }) {
     <div
       className={`flex flex-col gap-3 rounded-xl border ${border} bg-white/5 p-4 sm:flex-row sm:items-center sm:justify-between`}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
           <FlagBadge code={match.homeTeamCode} />
           <span className="font-medium">{match.homeTeam}</span>
@@ -163,9 +179,10 @@ function VancouverRow({ match }: { match: VancouverMatch }) {
         ) : null}
       </div>
 
-      <div className="text-sm text-white/60 sm:text-right">
+      <div className="flex flex-col gap-1.5 text-sm text-white/60 sm:items-end sm:text-right">
         <div>{formatPT(match.date)}</div>
         <div className="text-white/40">{subtitle}</div>
+        <VenuePill match={match} />
       </div>
     </div>
   );
@@ -176,7 +193,7 @@ function VancouverRow({ match }: { match: VancouverMatch }) {
 // ---------------------------------------------------------------------------
 
 export default async function Home() {
-  const nextMatch = getNextVancouverMatch();
+  const nextMatch = getNextCanadaMatch();
   const allLive = await fetchLiveMatches();
 
   const liveNow = allLive.filter((m) => m.status === "live");
@@ -191,21 +208,21 @@ export default async function Home() {
         <section>
           <span className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-emerald-400">
             <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
-            VanCup · BC Place
+            VanCup · Matches in Canada
           </span>
 
           <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
-            World Cup 2026 — Vancouver
+            World Cup 2026 — Canada
           </h1>
           <p className="mt-3 max-w-xl text-white/60">
-            Live scores and the full schedule for all 7 FIFA World Cup 2026
-            matches at BC Place.
+            Live scores and the 13 matches happening on Canadian soil — 7 at BC
+            Place in Vancouver and 6 at Toronto Stadium.
           </p>
 
           {nextMatch ? (
             <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-6">
               <div className="text-xs font-semibold uppercase tracking-wide text-emerald-400">
-                Next at BC Place
+                {`Next in Canada · ${nextMatch.stage} · ${nextMatch.venueCity}`}
               </div>
 
               <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -217,13 +234,14 @@ export default async function Home() {
                   <span>{nextMatch.awayTeam}</span>
                 </div>
 
-                <div className="text-sm text-white/60 sm:text-right">
+                <div className="flex flex-col gap-2 text-sm text-white/60 sm:items-end sm:text-right">
                   <div>{formatPT(nextMatch.date)}</div>
                   <div className="text-white/40">
                     {nextMatch.group
                       ? `${nextMatch.stage} · Group ${nextMatch.group}`
                       : nextMatch.stage}
                   </div>
+                  <VenuePill match={nextMatch} />
                 </div>
               </div>
 
@@ -235,7 +253,7 @@ export default async function Home() {
             </div>
           ) : (
             <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-6 text-white/60">
-              All BC Place matches have wrapped up. Thanks for a great
+              All Canadian matches have wrapped up. Thanks for a great
               tournament!
             </div>
           )}
@@ -256,15 +274,19 @@ export default async function Home() {
           </section>
         ) : null}
 
-        {/* All 7 BC Place matches */}
+        {/* All 13 matches in Canada */}
         <section className="mt-12">
-          <h2 className="text-lg font-semibold">All 7 BC Place matches</h2>
+          <h2 className="text-lg font-semibold">All 13 matches in Canada</h2>
+          <p className="mt-1 text-sm text-white/50">
+            Vancouver (BC Place): 7 matches · Toronto (Toronto Stadium / BMO
+            Field): 6 matches
+          </p>
           <p className="mt-1 text-sm text-white/50">
             Canada matches highlighted in red.
           </p>
           <div className="mt-4 flex flex-col gap-3">
-            {VANCOUVER_MATCHES.map((m) => (
-              <VancouverRow key={m.id} match={m} />
+            {CANADA_MATCHES.map((m) => (
+              <CanadaRow key={m.id} match={m} />
             ))}
           </div>
         </section>

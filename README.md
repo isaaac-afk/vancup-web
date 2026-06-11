@@ -1,8 +1,14 @@
 # VanCup 🇨🇦⚽
 
-A Vancouver-focused dashboard for **FIFA World Cup 2026** — live scores from across the tournament plus the full schedule for all **7 matches at BC Place**, including both of Canada's group-stage home games.
+A Canada-focused dashboard for **FIFA World Cup 2026** — live scores from across the tournament plus the full schedule for all **13 matches on Canadian soil**: 7 at BC Place in Vancouver and 6 at Toronto Stadium (BMO Field), including all three of Canada's group-stage home games.
 
-**Live URL:** _https://your-vancup.vercel.app_ (deploy in progress)
+**Live URL:** [vancup-web.vercel.app](https://vancup-web.vercel.app)
+
+## What it does
+
+- Surfaces the **next upcoming match in Canada** with venue, city, and kickoff time.
+- Lists **all 13 Canadian matches** — colour-coded by host stadium (BC Place / Toronto Stadium) with Canada games highlighted.
+- Shows a **Live now** section and a tournament-wide feed driven by the ESPN scoreboard API.
 
 ---
 
@@ -58,9 +64,9 @@ Browser ──▶ Next.js Server Component ──▶ ESPN scoreboard API
                      └─ cached with ISR (revalidate: 30s)
 ```
 
-- `lib/vancouver.ts` — the 7 statically known BC Place fixtures + `getNextVancouverMatch()`.
+- `lib/vancouver.ts` — the 13 statically known Canadian fixtures (`CANADA_MATCHES`) + `getNextCanadaMatch()`.
 - `lib/espn.ts` — typed client for ESPN's `soccer/fifa.world/scoreboard` endpoint; maps their `events[]` shape to a clean `LiveMatch` type and degrades gracefully (returns `[]`) on failure.
-- `app/page.tsx` — Server Component homepage: next BC Place match, a "Live now" section, all 7 Vancouver fixtures, and a tournament-wide feed.
+- `app/page.tsx` — Server Component homepage: next match in Canada, a "Live now" section, all 13 Canadian fixtures, and a tournament-wide feed.
 
 Why this shape? The World Cup starts **June 11, 2026**, so v1 prioritizes shipping a fast, reliable, read-only dashboard today with zero infra to manage.
 

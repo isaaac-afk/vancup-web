@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VanCup — World Cup 2026 in Vancouver",
+  title: "VanCup — World Cup 2026 in Canada",
   description:
-    "Live scores and the full schedule for all 7 FIFA World Cup 2026 matches at BC Place, Vancouver.",
+    "Live scores and the schedule for all 13 FIFA World Cup 2026 matches on Canadian soil — 7 at BC Place in Vancouver and 6 at Toronto Stadium (BMO Field).",
 };
 
 export default function RootLayout({
