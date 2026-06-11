@@ -1,4 +1,4 @@
-# VanCup 🇨🇦
+# CANCup 🇨🇦
 
 A Canada-focused dashboard for **FIFA World Cup 2026** — live scores from across the tournament plus the full schedule for all **13 matches on Canadian soil**: 7 at BC Place in Vancouver and 6 at Toronto Stadium (BMO Field), including all three of Canada's group-stage home games.
 
