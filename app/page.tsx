@@ -9,6 +9,7 @@ import Logo from "@/app/components/Logo";
 import Countdown from "@/app/components/Countdown";
 import AtmosphereLayer from "@/app/components/AtmosphereLayer";
 import FieldGrid from "@/app/components/FieldGrid";
+import FloatingBall from "@/app/components/FloatingBall";
 import {
   getMatchBorderGradient,
   getMatchGlow,
@@ -251,6 +252,9 @@ export default async function Home() {
         <section className="relative">
           {/* Perspective pitch behind the hero content */}
           <FieldGrid className="pointer-events-none absolute inset-0 z-0" />
+
+          {/* Floating soccer-ball accent, upper-right, behind the headline */}
+          <FloatingBall className="pointer-events-none absolute -top-2 right-0 z-0 h-24 w-24 opacity-50 sm:right-4 sm:top-2 sm:h-32 sm:w-32" />
 
           <div className="relative z-10">
           {/* Crest + wordmark, top-left */}

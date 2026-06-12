@@ -53,3 +53,75 @@ body {
     linear-gradient(180deg, #1a2332 0%, #14202a 45%, #0f1a14 100%);
   background-attachment: fixed;
 }
+
+/* =========================================================================
+   v1.7.1 — CSS-only ambient animations. Only `transform`/`opacity` animate
+   (compositor-friendly, no layout reflow). All motion is held static under
+   prefers-reduced-motion (block at the bottom).
+   ========================================================================= */
+
+/* 1. Drifting atmosphere — the gradient layers gently "breathe". Staggered
+   durations/delays so the three layers never move in lockstep. Amplitude is
+   a few px, so the scroll-depth mask reveal is unaffected. */
+@keyframes atmo-drift-1 {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-8px, -6px, 0); }
+}
+@keyframes atmo-drift-2 {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(7px, 5px, 0); }
+}
+@keyframes atmo-drift-3 {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(0, 9px, 0); }
+}
+.atmo-drift-1 { animation: atmo-drift-1 24s ease-in-out -3s infinite alternate; }
+.atmo-drift-2 { animation: atmo-drift-2 28s ease-in-out -9s infinite alternate; }
+.atmo-drift-3 { animation: atmo-drift-3 31s ease-in-out -15s infinite alternate; }
+
+/* 2. Floating soccer-ball accent — gentle bob on the wrapper, very slow spin
+   on the inner SVG (two transforms can't compose on one element, so we nest). */
+@keyframes ball-bob {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -10px, 0); }
+}
+@keyframes ball-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.ball-bob { animation: ball-bob 7s ease-in-out infinite; }
+.ball-spin {
+  transform-origin: 50% 50%;
+  animation: ball-spin 26s linear infinite;
+}
+
+/* 3. Stadium light shimmer — a faint floodlight glint sweeping the pitch.
+   Felt more than seen; sits behind all content so it never hurts legibility. */
+@keyframes field-sweep {
+  0% { transform: translate3d(-70%, 0, 0); }
+  100% { transform: translate3d(120%, 0, 0); }
+}
+.field-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    transparent 40%,
+    rgba(255, 248, 231, 0.1) 50%,
+    transparent 60%
+  );
+  animation: field-sweep 15s linear infinite;
+}
+
+/* Reduced-motion: hold every ambient animation perfectly still. */
+@media (prefers-reduced-motion: reduce) {
+  .atmo-drift-1,
+  .atmo-drift-2,
+  .atmo-drift-3,
+  .ball-bob,
+  .ball-spin,
+  .field-shimmer {
+    animation: none !important;
+  }
+  .field-shimmer {
+    opacity: 0;
+  }
+}

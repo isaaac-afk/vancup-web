@@ -22,7 +22,7 @@ export default function AtmosphereLayer() {
     >
       {/* Layer 1 — golden-hour sky */}
       <div
-        className="absolute inset-0 opacity-30 motion-reduce:opacity-10"
+        className="atmo-drift-1 absolute inset-0 opacity-30 motion-reduce:opacity-10"
         style={{
           maskImage: SKY,
           WebkitMaskImage: SKY,
@@ -34,7 +34,7 @@ export default function AtmosphereLayer() {
 
       {/* Layer 2 — field / grass diagonal stripes */}
       <div
-        className="absolute inset-0 opacity-25 motion-reduce:opacity-10"
+        className="atmo-drift-2 absolute inset-0 opacity-25 motion-reduce:opacity-10"
         style={{
           maskImage: FIELD,
           WebkitMaskImage: FIELD,
@@ -45,7 +45,7 @@ export default function AtmosphereLayer() {
 
       {/* Layer 3 — twilight glow */}
       <div
-        className="absolute inset-0 opacity-35 motion-reduce:opacity-10"
+        className="atmo-drift-3 absolute inset-0 opacity-35 motion-reduce:opacity-10"
         style={{
           maskImage: TWILIGHT,
           WebkitMaskImage: TWILIGHT,
