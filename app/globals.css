@@ -27,6 +27,14 @@ body {
   font-family: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Card surface — twilight navy at 95% so the atmospheric colour bleeds through
+   just slightly, plus a blur so busy backgrounds never hurt text legibility. */
+.card-surface {
+  background-color: rgba(26, 35, 50, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
 /* Warm twilight gradient with a golden-hour glow at the top.
    CSS-only (no image asset): layered radial glows over a navy→grass fade. */
 .bg-twilight-grain {

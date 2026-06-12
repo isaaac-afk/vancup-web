@@ -4,8 +4,15 @@ import {
   type CanadaMatch,
 } from "@/lib/vancouver";
 import { fetchLiveMatches, type LiveMatch } from "@/lib/espn";
+import type { CSSProperties } from "react";
 import Logo from "@/app/components/Logo";
 import Countdown from "@/app/components/Countdown";
+import AtmosphereLayer from "@/app/components/AtmosphereLayer";
+import FieldGrid from "@/app/components/FieldGrid";
+import {
+  getMatchBorderGradient,
+  getMatchGlow,
+} from "@/app/lib/flagColors";
 
 // Revalidate the page every 30s so live scores stay fresh (ISR).
 export const revalidate = 30;
@@ -74,12 +81,6 @@ function statusLabel(match: LiveMatch): string {
   return formatPT(match.date);
 }
 
-function cardBorder(match: LiveMatch): string {
-  if (match.status === "live") return "border-sunset/60";
-  if (match.isVancouverVenue) return "border-golden/50";
-  return "border-cream/10";
-}
-
 // ---------------------------------------------------------------------------
 // Match cards
 // ---------------------------------------------------------------------------
@@ -87,13 +88,23 @@ function cardBorder(match: LiveMatch): string {
 // Shared card for any ESPN-sourced match (live, final, or scheduled).
 function MatchCard({ match }: { match: LiveMatch }) {
   const showScore = match.status !== "scheduled";
+  const homeCode = match.homeTeamCode || "un";
+  const awayCode = match.awayTeamCode || "un";
+
+  const wrapStyle: CSSProperties = {
+    backgroundImage: getMatchBorderGradient(homeCode, awayCode),
+  };
+  // Keep live fixtures prominent with a sunset glow over the flag border.
+  if (match.status === "live") {
+    wrapStyle.boxShadow = getMatchGlow("un");
+  }
 
   return (
     <div
-      className={`flex flex-col gap-3 rounded-xl border ${cardBorder(
-        match
-      )} bg-surface/80 p-4 transition-all duration-200 hover:scale-[1.01] hover:shadow-lg hover:shadow-orange-500/10 sm:flex-row sm:items-center sm:justify-between`}
+      className="relative rounded-xl p-[2px] transition-all duration-200 hover:scale-[1.01]"
+      style={wrapStyle}
     >
+      <div className="card-surface flex flex-col gap-3 rounded-[10px] p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="flex items-center gap-2">
           <TeamLogo url={match.homeTeamLogo} code={match.homeTeamCode} />
@@ -133,6 +144,7 @@ function MatchCard({ match }: { match: LiveMatch }) {
           <span className="text-xs font-medium text-golden">BC Place</span>
         ) : null}
       </div>
+      </div>
     </div>
   );
 }
@@ -170,17 +182,29 @@ function CanadaPill({ size = "sm" }: { size?: "sm" | "lg" }) {
   );
 }
 
-// Card for a statically known Canadian fixture.
+// Card for a statically known Canadian fixture. The 2-colour gradient border is
+// painted with the two teams' flag colours; Canada home games get a thicker
+// border and a soft glow in Canada red.
 function CanadaRow({ match }: { match: CanadaMatch }) {
-  const border = match.isCanada ? "border-sunset/40" : "border-cream/10";
   const subtitle = match.group
     ? `${match.stage} · Group ${match.group}`
     : match.stage;
 
+  const wrapStyle: CSSProperties = {
+    backgroundImage: getMatchBorderGradient(match.homeTeamCode, match.awayTeamCode),
+  };
+  if (match.isCanada) {
+    wrapStyle.boxShadow = getMatchGlow(match.homeTeamCode);
+  }
+
   return (
     <div
-      className={`flex flex-col gap-3 rounded-xl border ${border} bg-surface/80 p-4 transition-all duration-200 hover:scale-[1.01] hover:shadow-lg hover:shadow-orange-500/10 sm:flex-row sm:items-center sm:justify-between`}
+      className={`relative rounded-xl transition-all duration-200 hover:scale-[1.01] ${
+        match.isCanada ? "p-[3px]" : "p-[2px]"
+      }`}
+      style={wrapStyle}
     >
+      <div className="card-surface flex flex-col gap-3 rounded-[10px] p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
           <FlagBadge code={match.homeTeamCode} />
@@ -198,6 +222,7 @@ function CanadaRow({ match }: { match: CanadaMatch }) {
         <div>{formatPT(match.date)}</div>
         <div className="text-cream/40">{subtitle}</div>
         <VenuePill match={match} />
+      </div>
       </div>
     </div>
   );
@@ -217,10 +242,17 @@ export default async function Home() {
     .slice(0, 8);
 
   return (
-    <main className="bg-twilight-grain min-h-screen flex-1 text-cream">
-      <div className="mx-auto w-full max-w-3xl px-5 py-12 sm:py-16">
+    <main className="bg-twilight-grain relative min-h-screen flex-1 text-cream">
+      {/* Scroll-linked atmosphere, behind everything (stretches to full height) */}
+      <AtmosphereLayer />
+
+      <div className="relative mx-auto w-full max-w-3xl px-5 py-12 sm:py-16">
         {/* Hero */}
-        <section>
+        <section className="relative">
+          {/* Perspective pitch behind the hero content */}
+          <FieldGrid className="pointer-events-none absolute inset-0 z-0" />
+
+          <div className="relative z-10">
           {/* Crest + wordmark, top-left */}
           <div className="flex items-center gap-2.5">
             <Logo className="h-10 w-10" />
@@ -283,6 +315,7 @@ export default async function Home() {
               tournament!
             </div>
           )}
+          </div>
         </section>
 
         {/* Live now */}
