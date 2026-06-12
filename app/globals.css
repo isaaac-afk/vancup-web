@@ -1,26 +1,127 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* VanCup v1.6 — "summer soccer at golden hour" palette */
+@theme {
+  --color-sunset: #ff6b35; /* primary accent  — sunset orange */
+  --color-golden: #ffb627; /* secondary       — golden hour yellow */
+  --color-pitch: #3a7d44; /* tertiary        — pitch green */
+  --color-pitch-light: #8ed49b; /* readable pitch-green text on dark */
+  --color-cream: #fff8e7; /* main text       — warm cream */
+  --color-twilight: #1a2332; /* background base — twilight navy */
+  --color-grass: #0f1a14; /* background deep — grass shadow */
+  --color-surface: #222d3f; /* card surface    — twilight navy +~3% */
 }
 
+/* Map font CSS variables (set by next/font) onto Tailwind utilities. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-inter);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-grass);
+  color: var(--color-cream);
+}
+
+/* Headline font utility — Bricolage Grotesque via next/font variable. */
+.font-headline {
+  font-family: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Card surface — twilight navy at 95% so the atmospheric colour bleeds through
+   just slightly, plus a blur so busy backgrounds never hurt text legibility. */
+.card-surface {
+  background-color: rgba(26, 35, 50, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Warm twilight gradient with a golden-hour glow at the top.
+   CSS-only (no image asset): layered radial glows over a navy→grass fade. */
+.bg-twilight-grain {
+  background-color: var(--color-twilight);
+  background-image:
+    radial-gradient(
+      70% 55% at 50% -5%,
+      rgba(255, 182, 39, 0.12),
+      transparent 60%
+    ),
+    radial-gradient(
+      55% 45% at 88% 6%,
+      rgba(255, 107, 53, 0.12),
+      transparent 55%
+    ),
+    linear-gradient(180deg, #1a2332 0%, #14202a 45%, #0f1a14 100%);
+  background-attachment: fixed;
+}
+
+/* =========================================================================
+   v1.7.1 — CSS-only ambient animations. Only `transform`/`opacity` animate
+   (compositor-friendly, no layout reflow). All motion is held static under
+   prefers-reduced-motion (block at the bottom).
+   ========================================================================= */
+
+/* 1. Drifting atmosphere — the gradient layers gently "breathe". Staggered
+   durations/delays so the three layers never move in lockstep. Amplitude is
+   a few px, so the scroll-depth mask reveal is unaffected. */
+@keyframes atmo-drift-1 {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-8px, -6px, 0); }
+}
+@keyframes atmo-drift-2 {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(7px, 5px, 0); }
+}
+@keyframes atmo-drift-3 {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(0, 9px, 0); }
+}
+.atmo-drift-1 { animation: atmo-drift-1 24s ease-in-out -3s infinite alternate; }
+.atmo-drift-2 { animation: atmo-drift-2 28s ease-in-out -9s infinite alternate; }
+.atmo-drift-3 { animation: atmo-drift-3 31s ease-in-out -15s infinite alternate; }
+
+/* 2. Floating soccer-ball accent — gentle bob on the wrapper, very slow spin
+   on the inner SVG (two transforms can't compose on one element, so we nest). */
+@keyframes ball-bob {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -10px, 0); }
+}
+@keyframes ball-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.ball-bob { animation: ball-bob 7s ease-in-out infinite; }
+.ball-spin {
+  transform-origin: 50% 50%;
+  animation: ball-spin 26s linear infinite;
+}
+
+/* 3. Stadium light shimmer — a faint floodlight glint sweeping the pitch.
+   Felt more than seen; sits behind all content so it never hurts legibility. */
+@keyframes field-sweep {
+  0% { transform: translate3d(-70%, 0, 0); }
+  100% { transform: translate3d(120%, 0, 0); }
+}
+.field-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    transparent 40%,
+    rgba(255, 248, 231, 0.1) 50%,
+    transparent 60%
+  );
+  animation: field-sweep 15s linear infinite;
+}
+
+/* Reduced-motion: hold every ambient animation perfectly still. */
+@media (prefers-reduced-motion: reduce) {
+  .atmo-drift-1,
+  .atmo-drift-2,
+  .atmo-drift-3,
+  .ball-bob,
+  .ball-spin,
+  .field-shimmer {
+    animation: none !important;
+  }
+  .field-shimmer {
+    opacity: 0;
+  }
 }
